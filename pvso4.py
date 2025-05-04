@@ -47,36 +47,50 @@ def cleanUp(pointCloud):
     pcd = pointCloud
 
     number_of_planes = 10
-    planes =[]
-    colors = generate_random_colors(number_of_planes)
-    planeMemory = o3d.geometry.PointCloud()
+    planes = []
+    planes_withColors = []
     planes_combined = o3d.geometry.PointCloud()
+    planes_combined_withColors = o3d.geometry.PointCloud()
+    colors = generate_random_colors(number_of_planes)
 
-    #Detect multiply planes
+    # Detect multiple planes
     for i in range(number_of_planes):
-        plane_model, plane = pcd.segment_plane(0.01, 3, 1000)
+        plane_model, detected_plane = pcd.segment_plane(distance_threshold=0.01, ransac_n=3, num_iterations=1000)
 
-        plane_points = pcd.select_by_index(plane, invert=False)
+        if len(detected_plane) < 100:
+            break
 
-        planeMemory.points = plane_points.points
-        planeMemory.colors = plane_points.colors
-        #Color unifi
-        #plane_points.paint_uniform_color(colors[i % len(colors)])
-
+        # Extract points with original color
+        plane_points = pcd.select_by_index(detected_plane, invert=False)
         planes.append(plane_points)
 
-        # Remove inliers for next iteration
-        pcd = pcd.select_by_index(plane, invert=True)
+        # Create a new point cloud for visualization with color
+        plane_visualColor = o3d.geometry.PointCloud()
+        plane_visualColor.points = plane_points.points
+        plane_visualColor.paint_uniform_color(colors[i % len(colors)])
+        planes_withColors.append(plane_visualColor)
 
-        planes_combined += planeMemory
+        # Remove detected plane from the input
+        pcd = pcd.select_by_index(detected_plane, invert=True)
 
+    # Combine all planes
+    for plane in planes:
+        planes_combined += plane
 
-    #pcd.paint_uniform_color([0.5, 0.5, 0.5])  # Gray for remaining points
+    for colored_plane in planes_withColors:
+        planes_combined_withColors += colored_plane
 
-    o3d.visualization.draw_geometries([planeMemory]) #Display planes
+    planes_combined = planes_combined.remove_duplicated_points()
+    planes_combined_withColors = planes_combined_withColors.remove_duplicated_points()
 
-    #o3d.visualization.draw_geometries([pcd])
+    #Removing outliers
+    planes_combined, _ = planes_combined.remove_radius_outlier(nb_points=16, radius=0.05)
+    planes_combined_withColors, _ = planes_combined_withColors.remove_radius_outlier(nb_points=16, radius=0.05)
 
+    #Visualization
+    o3d.visualization.draw_geometries([planes_combined_withColors],"Planes selected")
+    o3d.visualization.draw_geometries([planes_combined], "Filtered point cloud")  # Display planes
 
+    return(planes_combined)
 
-main('output_big.pcd',False)
+main('output.pcd',True)
