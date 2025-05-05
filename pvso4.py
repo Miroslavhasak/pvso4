@@ -48,7 +48,7 @@ def cleanUp(pointCloud,duplicatesRemove,outlierRemove):
     pcd = pointCloud
 
     number_of_bigPlanes = 10
-    number_of_smallPlanes = 10
+    number_of_smallPlanes = 20
     planes = []
     planes_withColors = []
     planes_combined = o3d.geometry.PointCloud()
@@ -66,6 +66,8 @@ def cleanUp(pointCloud,duplicatesRemove,outlierRemove):
 
         # Extract points with original color
         plane_points = pcd.select_by_index(detected_plane, invert=False)
+        if(outlierRemove):
+            plane_points, _ = plane_points.remove_radius_outlier(nb_points=16, radius=0.05)
         planes.append(plane_points)
 
         # Create a new point cloud for visualization with color
@@ -89,6 +91,8 @@ def cleanUp(pointCloud,duplicatesRemove,outlierRemove):
 
         # Extract points with original color
         plane_points = pcd.select_by_index(detected_plane, invert=False)
+        if(outlierRemove):
+            plane_points, _ = plane_points.remove_radius_outlier(nb_points=16, radius=0.05)
         planes.append(plane_points)
 
         # Create a new point cloud for visualization with color
@@ -116,10 +120,10 @@ def cleanUp(pointCloud,duplicatesRemove,outlierRemove):
         print("Removing duplicated points...Done")
 
     #Removing outliers
-    if(outlierRemove):
-        planes_combined, _ = planes_combined.remove_radius_outlier(nb_points=16, radius=0.05)
-        planes_combined_withColors, _ = planes_combined_withColors.remove_radius_outlier(nb_points=16, radius=0.05)
-        print("Removing outliers...Done")
+    #if(outlierRemove):
+    #    planes_combined, _ = planes_combined.remove_radius_outlier(nb_points=16, radius=0.05)
+    #    planes_combined_withColors, _ = planes_combined_withColors.remove_radius_outlier(nb_points=16, radius=0.05)
+    #    print("Removing outliers...Done")
 
     #Visualization
     o3d.visualization.draw_geometries([planes_combined_withColors],"Planes selected")
@@ -130,4 +134,4 @@ def cleanUp(pointCloud,duplicatesRemove,outlierRemove):
 
 
 
-main('output_big.pcd', True)
+main('output.pcd', True)
