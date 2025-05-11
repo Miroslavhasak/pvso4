@@ -16,6 +16,8 @@ def main(file,colors):
 
     cleanUp(data,True,True)
 
+    dbscanAlgorithm(data)
+
 def use_o3d(file,colors):
     pcd = o3d.geometry.PointCloud()
     #pcd.points = o3d.utility.Vector3dVector(pts)
@@ -126,12 +128,42 @@ def cleanUp(pointCloud,duplicatesRemove,outlierRemove):
     #    print("Removing outliers...Done")
 
     #Visualization
-    o3d.visualization.draw_geometries([planes_combined_withColors],"Planes selected")
-    o3d.visualization.draw_geometries([planes_combined], "Filtered point cloud")  # Display planes
+    #o3d.visualization.draw_geometries([planes_combined_withColors],"Planes selected")
+    #o3d.visualization.draw_geometries([planes_combined], "Filtered point cloud")  # Display planes
 
     #TODO Add saving the result
     return(planes_combined)
 
+def dbscanAlgorithm(pointCloud):
+    #K mean is taken
 
 
-main('output.pcd', True)
+    pcd = o3d.geometry.PointCloud()
+    pcd = pointCloud
+
+    clusters = np.asarray(pcd.cluster_dbscan(eps=0.01, min_points=10, print_progress=False))
+
+    numberOfclusters = len(set(clusters)) - (1 if -1 in clusters else 0)
+    print(numberOfclusters)
+
+    colorsForClusters = generate_random_colors(numberOfclusters)
+
+    pcdClusters = [o3d.geometry.PointCloud() for _ in range(numberOfclusters)]
+
+    pcdNpPoints = np.asarray(pcd.points)
+
+    for i in range(numberOfclusters):
+        pcdClusters[i].points = o3d.utility.Vector3dVector(pcdNpPoints[clusters == i])
+        pcdClusters[i].paint_uniform_color(colorsForClusters[i])
+
+    #Combine the cluster to one point cloud
+    pcdClustersCombined = o3d.geometry.PointCloud()
+    for i in range(numberOfclusters):
+        pcdClustersCombined += pcdClusters[i]
+
+    #Visualization
+    o3d.visualization.draw_geometries([pcdClustersCombined], "Segmented space")
+
+
+
+main('example4.ply', True)
