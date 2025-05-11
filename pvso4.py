@@ -9,14 +9,63 @@ def generate_random_colors(n):
         color = np.random.rand(3)
         colors.append(color)
     return colors
+  
+  
+############################################################################################################################################################
 
+def euclidean_distance(a, b):
+    return np.linalg.norm(a - b)
+
+def k_means(X, k, max_iters=100):
+    n_samples, n_features = X.shape
+    np.random.seed(42)
+    initial_indices = np.random.choice(n_samples, k, replace=False)
+    centers = X[initial_indices]
+
+    for _ in range(max_iters):
+        clusters = [[] for _ in range(k)]
+        for point in X:
+            distances = [euclidean_distance(point, center) for center in centers]
+            cluster_idx = np.argmin(distances)
+            clusters[cluster_idx].append(point)
+
+        new_centers = np.zeros((k, n_features))
+        for idx, cluster in enumerate(clusters):
+            if cluster:
+                new_centers[idx] = np.mean(cluster, axis=0)
+            else:
+                new_centers[idx] = X[np.random.randint(n_samples)]
+
+        if np.allclose(centers, new_centers):
+            break
+        centers = new_centers
+
+    labels = np.zeros(n_samples, dtype=int)
+    for idx, point in enumerate(X):
+        distances = [euclidean_distance(point, center) for center in centers]
+        labels[idx] = np.argmin(distances)
+
+    return centers, labels
+
+def apply_k_means_to_pcd(pcd, k):
+    points = np.asarray(pcd.points)
+    centers, labels = k_means(points, k)
+    colors = generate_random_colors(k)
+
+    # Pridanie farieb podla klastrov
+    cluster_colors = np.array([colors[label] for label in labels])
+    pcd.colors = o3d.utility.Vector3dVector(cluster_colors)
+
+    # Vizualizacia
+    o3d.visualization.draw_geometries([pcd], window_name="K-means clustering")
+    
+############################################################################################################################################################
+    
 def main(file,colors):
     data = use_o3d(file,colors)
     #o3d.visualization.draw_geometries([data], "Loaded Point Cloud")
 
     cleanUp(data,True,True)
-
-    dbscanAlgorithm(data)
 
 def use_o3d(file,colors):
     pcd = o3d.geometry.PointCloud()
@@ -128,42 +177,12 @@ def cleanUp(pointCloud,duplicatesRemove,outlierRemove):
     #    print("Removing outliers...Done")
 
     #Visualization
-    #o3d.visualization.draw_geometries([planes_combined_withColors],"Planes selected")
-    #o3d.visualization.draw_geometries([planes_combined], "Filtered point cloud")  # Display planes
+    o3d.visualization.draw_geometries([planes_combined_withColors],"Planes selected")
+    o3d.visualization.draw_geometries([planes_combined], "Filtered point cloud")  # Display planes
 
     #TODO Add saving the result
     return(planes_combined)
 
-def dbscanAlgorithm(pointCloud):
-    #K mean is taken
 
 
-    pcd = o3d.geometry.PointCloud()
-    pcd = pointCloud
-
-    clusters = np.asarray(pcd.cluster_dbscan(eps=0.01, min_points=10, print_progress=False))
-
-    numberOfclusters = len(set(clusters)) - (1 if -1 in clusters else 0)
-    print(numberOfclusters)
-
-    colorsForClusters = generate_random_colors(numberOfclusters)
-
-    pcdClusters = [o3d.geometry.PointCloud() for _ in range(numberOfclusters)]
-
-    pcdNpPoints = np.asarray(pcd.points)
-
-    for i in range(numberOfclusters):
-        pcdClusters[i].points = o3d.utility.Vector3dVector(pcdNpPoints[clusters == i])
-        pcdClusters[i].paint_uniform_color(colorsForClusters[i])
-
-    #Combine the cluster to one point cloud
-    pcdClustersCombined = o3d.geometry.PointCloud()
-    for i in range(numberOfclusters):
-        pcdClustersCombined += pcdClusters[i]
-
-    #Visualization
-    o3d.visualization.draw_geometries([pcdClustersCombined], "Segmented space")
-
-
-
-main('example4.ply', True)
+main('output.pcd', True)
