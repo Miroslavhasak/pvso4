@@ -3,6 +3,7 @@ import open3d as o3d
 import copy
 import random
 from sklearn.cluster import Birch
+from sklearn.cluster import DBSCAN
 
 def generate_random_colors(n):
     colors = []
@@ -68,8 +69,8 @@ def main(file,colors):
 
     dataClean = cleanUp(data,True,True)
 
-    # dbscanAlgorithm(dataClean)
-    birchAlgorithm(dataClean)
+    dbscanAlgorithm(dataClean)
+    #birchAlgorithm(dataClean)
 
     #apply_k_means_to_pcd(data, 4) ???????????????
 
@@ -103,8 +104,13 @@ def use_o3d(file,colors):
 
 def dbscanAlgorithm(pointCloud):
     pcd = pointCloud
+    #o3d.visualization.draw_geometries([pcd], "Test view")
 
-    clusters = np.asarray(pcd.cluster_dbscan(eps=0.08, min_points=20, print_progress=True))
+    #clusters = np.asarray(pcd.cluster_dbscan(eps=0.08, min_points=20, print_progress=True))
+
+    PcdXYZandRGB = np.hstack((np.asarray(pcd.points), np.asarray(pcd.colors)))
+
+    clusters = DBSCAN(eps=0.075, min_samples=20).fit_predict(PcdXYZandRGB)
 
     numberOfclusters = len(set(clusters)) - (1 if -1 in clusters else 0)
     print(numberOfclusters)
@@ -131,8 +137,8 @@ def birchAlgorithm(pointCloud):
     # Convert point cloud to NumPy
     points = np.asarray(pointCloud.points)
 
-    threshold=0.6
-    n_clusters=10
+    threshold=1.2
+    n_clusters=20
 
 
     #The Birch algo
@@ -238,12 +244,12 @@ def cleanUp(pointCloud,duplicatesRemove,outlierRemove):
     #    print("Removing outliers...Done")
 
     #Visualization
-    o3d.visualization.draw_geometries([planes_combined_withColors],"Planes selected")
-    o3d.visualization.draw_geometries([planes_combined], "Filtered point cloud")  # Display planes
+    #o3d.visualization.draw_geometries([planes_combined_withColors],"Planes selected")
+    #o3d.visualization.draw_geometries([planes_combined], "Filtered point cloud")  # Display planes
 
     #TODO Add saving the result
     return(planes_combined)
 
 
 
-main('output.pcd', True)
+main('example4.ply', True)
