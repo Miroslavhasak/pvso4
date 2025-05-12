@@ -2,6 +2,7 @@ import numpy as np
 import open3d as o3d
 import copy
 import random
+from sklearn.cluster import Birch
 
 def generate_random_colors(n):
     colors = []
@@ -65,7 +66,12 @@ def main(file,colors):
     data = use_o3d(file,colors)
     #o3d.visualization.draw_geometries([data], "Loaded Point Cloud")
 
-    cleanUp(data,True,True)
+    dataClean = cleanUp(data,True,True)
+
+    # dbscanAlgorithm(dataClean)
+    birchAlgorithm(dataClean)
+
+    apply_k_means_to_pcd(data, 4)
 
 def use_o3d(file,colors):
     pcd = o3d.geometry.PointCloud()
@@ -94,6 +100,61 @@ def use_o3d(file,colors):
     #o3d.visualization.draw_geometries([pointCloudPoints])
 
     return(pointCloudPoints)
+
+def dbscanAlgorithm(pointCloud):
+    pcd = pointCloud
+
+    clusters = np.asarray(pcd.cluster_dbscan(eps=0.08, min_points=20, print_progress=True))
+
+    numberOfclusters = len(set(clusters)) - (1 if -1 in clusters else 0)
+    print(numberOfclusters)
+
+    colorsForClusters = generate_random_colors(numberOfclusters)
+
+    pcdClusters = [o3d.geometry.PointCloud() for _ in range(numberOfclusters)]
+
+    pcdNpPoints = np.asarray(pcd.points)
+
+    for i in range(numberOfclusters):
+        pcdClusters[i].points = o3d.utility.Vector3dVector(pcdNpPoints[clusters == i])
+        pcdClusters[i].paint_uniform_color(colorsForClusters[i])
+
+    #Combine the cluster to one point cloud
+    pcdClustersCombined = o3d.geometry.PointCloud()
+    for i in range(numberOfclusters):
+        pcdClustersCombined += pcdClusters[i]
+
+    #Visualization
+    o3d.visualization.draw_geometries([pcdClustersCombined], "Segmented space")
+
+def birchAlgorithm(pointCloud):
+    # Convert point cloud to NumPy
+    points = np.asarray(pointCloud.points)
+
+    threshold=0.6
+    n_clusters=10
+
+
+    #The Birch algo
+    birch = Birch(threshold=threshold, n_clusters=n_clusters)
+    labels = birch.fit_predict(points)
+
+    #Colors yessss
+    unique_labels = np.unique(labels)
+    num_clusters = len(unique_labels)
+    print(f"Clusters found: {num_clusters}")
+
+    #Create the colors yessss
+    color_map = generate_random_colors(num_clusters)
+    color_array = np.array([color_map[label] for label in labels])
+
+
+    colored_pcd = o3d.geometry.PointCloud()
+    colored_pcd.points = o3d.utility.Vector3dVector(points)
+    colored_pcd.colors = o3d.utility.Vector3dVector(color_array)
+
+    # Visualize result
+    o3d.visualization.draw_geometries([colored_pcd], window_name="BIRCH Clustering")
 
 def cleanUp(pointCloud,duplicatesRemove,outlierRemove):
     pcd = pointCloud
