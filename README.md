@@ -27,10 +27,12 @@ vanie algoritmov a načítajte mračno dostupného datasetu [2 b.].
  konkrétny algoritmus ale používate funkcie tretích strán je potrebné rozumieť aj ako sú
  funkcie implementované)
 
-6. Vytvorte dokumentáciu zadania:
+6. Vytvorte dokumentáciu zadania: [2 b.].
+
  • popis implementovaných algoritmov,
+
  • grafické porovnanie výstupov,
+
  • vysvetlite rozdiel v kvalite výstupov pre rozdielne typy algortimov.
-  [2 b.].
 
 # Dokumentácia 
