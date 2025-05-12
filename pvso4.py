@@ -244,8 +244,8 @@ def cleanUp(pointCloud,duplicatesRemove,outlierRemove):
     #    print("Removing outliers...Done")
 
     #Visualization
-    #o3d.visualization.draw_geometries([planes_combined_withColors],"Planes selected")
-    #o3d.visualization.draw_geometries([planes_combined], "Filtered point cloud")  # Display planes
+    o3d.visualization.draw_geometries([planes_combined_withColors],"Planes selected")
+    o3d.visualization.draw_geometries([planes_combined], "Filtered point cloud")  # Display planes
 
     #TODO Add saving the result
     return(planes_combined)
