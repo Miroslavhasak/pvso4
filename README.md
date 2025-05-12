@@ -1,4 +1,5 @@
-PVSO 4. Zadanie
+# PVSO 4. Zadanie
+
 **Znenie zadania**
 
 Cieľom zadania, je oboznámit’ sa s pracou s mračnom bodov (point cloud) a segmentácia ob
@@ -7,7 +8,7 @@ jektov v priestore. Študent si vyskúša vytvorenie vlastného mračna bodov a 
  a iných je dovolené a odporúčané.
  Zadanie je dokopy za 25b.a pozostáva z viacerých úloh:
 
- **Úlohy:**
+ ### Úlohy:
  1. Vytvorenie mračna bodov pomocou Kinect v2 pre testovanie. Nájdite online na webe
  mračno bodov popisujúce väčší priestor (väčší objem dát aspoň 4 x 4 metre) pre testo
 vanie algoritmov a načítajte mračno dostupného datasetu [2 b.].
@@ -32,10 +33,4 @@ vanie algoritmov a načítajte mračno dostupného datasetu [2 b.].
  • vysvetlite rozdiel v kvalite výstupov pre rozdielne typy algortimov.
   [2 b.].
 
-# Dokumentácia h1
-
-## Dokumentácia h2
-
-### Dokumentácia h3
-
-#### Dokumentácia h4
+# Dokumentácia 
