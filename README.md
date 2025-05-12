@@ -36,3 +36,34 @@ vanie algoritmov a načítajte mračno dostupného datasetu [2 b.].
  • vysvetlite rozdiel v kvalite výstupov pre rozdielne typy algortimov.
 
 # Dokumentácia 
+
+V zadaní sme použili 2 algoritmy a to K-means DBSCAN.
+
+### K-means
+
+Tento algoritmus funguje tak ze si vytvoríme k klustrov ku ktorým priradíme najbližšie 
+body pomocou vzdialenosti následne najdeme stred klustrov a znova odmeráme vzdialenosti 
+každého bodu od klustrov.
+
+### DBSCAN
+
+DBSCAN je hustotne založený algoritmus, ktorý vytvára klastre na základe hustoty bodov 
+v priestore. Pre každý bod vyhľadá okolie v určitej vzdialenosti. Ak má okolie aspoň 
+min_points bodov, považuje sa za jadrový bod a vytvorí nový klaster, ku ktorému sa 
+pridávajú všetky husté susedné body. Body, ktoré nepatria do žiadneho klastru, 
+sa označia ako šum. Algoritmus dokáže nájsť arbitrárne tvarované klastre a zároveň 
+identifikovať odľahlé body bez potreby určovať počet klastrov vopred.
+
+Po aplikovaní každého algoritmu sa výsledné klastre vizualizujú pomocou Open3D:
+
+K-means:
+
+Každý klaster je farebne rozlíšený.
+
+Výstupné okno: "K-means clustering"
+
+DBSCAN:
+
+Vizualizácia zhlukov s odstráneným šumom.
+
+Výstupné okno: "Segmented space"
