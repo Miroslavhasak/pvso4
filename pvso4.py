@@ -71,7 +71,7 @@ def main(file,colors):
     # dbscanAlgorithm(dataClean)
     birchAlgorithm(dataClean)
 
-    apply_k_means_to_pcd(data, 4)
+    #apply_k_means_to_pcd(data, 4) ???????????????
 
 def use_o3d(file,colors):
     pcd = o3d.geometry.PointCloud()
