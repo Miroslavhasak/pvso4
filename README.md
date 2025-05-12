@@ -67,3 +67,19 @@ DBSCAN:
 Vizualizácia zhlukov s odstráneným šumom.
 
 Výstupné okno: "Segmented space"
+
+Príklad segmentácie:
+![example_segmentacia](https://github.com/user-attachments/assets/42423e0d-2088-4600-bee4-3eb498f259ce)
+
+
+Príklad farebnej segmentácie:
+![example_segmentacia_colorfull](https://github.com/user-attachments/assets/7705ab03-2639-437f-a772-0c80d466cb7e)
+
+
+
+Príklad dbskenu:
+![example_dbscan](https://github.com/user-attachments/assets/d81298e9-bf83-4ca4-8210-2e87f6a6bc2d)
+
+
+
+
